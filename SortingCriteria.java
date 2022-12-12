@@ -1,0 +1,5 @@
+public enum SortingCriteria {
+    BASED_ON_PROCESS_BURST_TIME,
+    BASED_ON_PROCESS_PRIORITY,
+    BASED_ON_PROCESS_ARRIVAL_TIME,
+}
