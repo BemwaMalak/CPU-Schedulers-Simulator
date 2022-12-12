@@ -11,7 +11,7 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException, IOException {
         Scanner scanner = new Scanner(System.in);
-
+        new File("logs").mkdir();
         while (true){
             System.out.println("Please choose the scheduling algorithm that you want to simulate: ");
             int choice = 0;
