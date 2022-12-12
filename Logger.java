@@ -1,10 +1,12 @@
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
 public class Logger {
     private final FileWriter fileWriter;
-    public Logger(String logFileName) throws IOException {
-        fileWriter = new FileWriter(logFileName, true);
+    public Logger(File logFile) throws IOException {
+        logFile.createNewFile();
+        fileWriter = new FileWriter(logFile, true);
     }
     public void logSchedulerFinished(int currentTimeStamp) throws IOException {
         fileWriter.write("[Second " + currentTimeStamp + "] " + "Scheduler finished \n");
