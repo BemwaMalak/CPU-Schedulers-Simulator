@@ -153,7 +153,16 @@ public class Main {
         TimeManager timeManager = new TimeManager();
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-        File logFile = new File("logs\\" + dateFormatter.format(timestamp) + " ShortestJobFirst.txt");
+        String logFilePath = "logs\\" + dateFormatter.format(timestamp) + " ";
+
+        switch (scheduler){
+            case SHORTEST_JOB_FIRST -> logFilePath += "ShortestJobFirst.txt";
+            case PRIORITY -> logFilePath += "Priority.txt";
+            case ROUND_ROBIN -> logFilePath += "RoundRobin.txt";
+        }
+
+
+        File logFile = new File(logFilePath);
         Logger logger = new Logger(logFile);
 
         int totalNumberOfProcesses;
