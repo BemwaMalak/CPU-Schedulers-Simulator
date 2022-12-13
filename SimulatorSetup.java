@@ -6,14 +6,15 @@ public class SimulatorSetup {
     private TimeManager timeManager;
 
 
-    public SimulatorSetup(int totalNumberOfProcesses, int contextSwitchingCost, int quantumTime, Logger logger, TimeManager timeManager){
+    public SimulatorSetup(int totalNumberOfProcesses, int contextSwitchingCost, int quantumTime, Logger logger, TimeManager timeManager) {
         this.totalNumberOfProcesses = totalNumberOfProcesses;
         this.contextSwitchingCost = contextSwitchingCost;
         this.logger = logger;
         this.timeManager = timeManager;
         this.quantumTime = quantumTime;
     }
-    public SimulatorSetup(int totalNumberOfProcesses, int contextSwitchingCost, Logger logger, TimeManager timeManager){
+
+    public SimulatorSetup(int totalNumberOfProcesses, int contextSwitchingCost, Logger logger, TimeManager timeManager) {
         this.totalNumberOfProcesses = totalNumberOfProcesses;
         this.contextSwitchingCost = contextSwitchingCost;
         this.logger = logger;

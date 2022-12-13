@@ -12,11 +12,10 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
 
 
-
         // Create logs directory for logger
         new File("logs").mkdir();
 
-        while (true){
+        while (true) {
             askUserForChoice();
         }
 
@@ -38,7 +37,7 @@ public class Main {
         choice = scanner.nextInt();
 
         // System Exit
-        if(choice == 4){
+        if (choice == 4) {
             System.exit(0);
         }
 
@@ -48,10 +47,10 @@ public class Main {
         startScheduler(scheduler);
 
 
-
     }
-    private static Schedulers getSchedulerTypeFromChoice(int choice){
-        switch (choice){
+
+    private static Schedulers getSchedulerTypeFromChoice(int choice) {
+        switch (choice) {
             case 1:
                 return Schedulers.SHORTEST_JOB_FIRST;
             case 2:
@@ -61,6 +60,7 @@ public class Main {
         }
         return null;
     }
+
     private static void startScheduler(Schedulers schedulerType) throws IOException, InterruptedException {
         SimulatorSetup simulatorSetup = getSimulatorSetupFromUser(schedulerType);
         Vector<ProcessControlBlock> processes = getProcessesFromUser(simulatorSetup, schedulerType);
@@ -69,13 +69,8 @@ public class Main {
         ProcessQueue jobQueue = new ProcessQueue();
 
         jobQueue.addAll(processes);
-        Scheduler scheduler;
-        if(schedulerType == Schedulers.ROUND_ROBIN){
-            scheduler = SchedulerFactory.getScheduler(schedulerType, readyQueue, simulatorSetup.getTimeManager(), simulatorSetup.getLogger(), simulatorSetup.getContextSwitchingCost(), simulatorSetup.getQuantumTime());
-        }else{
-            scheduler = SchedulerFactory.getScheduler(schedulerType, readyQueue, simulatorSetup.getTimeManager(), simulatorSetup.getLogger(), simulatorSetup.getContextSwitchingCost());
-        }
 
+        Scheduler scheduler = SchedulerFactory.getScheduler(schedulerType, readyQueue, simulatorSetup.getTimeManager(), simulatorSetup.getLogger(), simulatorSetup.getContextSwitchingCost(), simulatorSetup.getQuantumTime());
         LongTermScheduler longTermScheduler = new LongTermScheduler(jobQueue, readyQueue, simulatorSetup.getTimeManager(), simulatorSetup.getLogger());
 
         scheduler.start();
@@ -96,7 +91,7 @@ public class Main {
 
         String logFilePath = "logs\\" + dateFormatter.format(timestamp) + " ";
 
-        switch (schedulerType){
+        switch (schedulerType) {
             case SHORTEST_JOB_FIRST -> logFilePath += "ShortestJobFirst.txt";
             case PRIORITY -> logFilePath += "Priority.txt";
             case ROUND_ROBIN -> logFilePath += "RoundRobin.txt";
@@ -115,7 +110,7 @@ public class Main {
         System.out.println("Please enter the context switching cost: ");
         contextSwitchingCost = scanner.nextInt();
 
-        if(schedulerType == Schedulers.ROUND_ROBIN){
+        if (schedulerType == Schedulers.ROUND_ROBIN) {
 
             System.out.println("Please enter the quantum time: ");
             int quantumTime = scanner.nextInt();
@@ -123,7 +118,7 @@ public class Main {
             SimulatorSetup simulatorSetup = new SimulatorSetup(totalNumberOfProcesses, contextSwitchingCost, quantumTime, logger, timeManager);
 
             return simulatorSetup;
-        }else{
+        } else {
 
             SimulatorSetup simulatorSetup = new SimulatorSetup(totalNumberOfProcesses, contextSwitchingCost, logger, timeManager);
 
@@ -131,17 +126,16 @@ public class Main {
         }
 
 
-
     }
 
-    private static Vector<ProcessControlBlock> getProcessesFromUser(SimulatorSetup simulatorSetup, Schedulers schedulerType){
+    private static Vector<ProcessControlBlock> getProcessesFromUser(SimulatorSetup simulatorSetup, Schedulers schedulerType) {
         Scanner scanner = new Scanner(System.in);
 
         int totalNumberOfProcesses = simulatorSetup.getTotalNumberOfProcesses();
         Vector<ProcessControlBlock> processes = new Vector<>();
 
 
-        for(int i = 0; i < totalNumberOfProcesses; i++){
+        for (int i = 0; i < totalNumberOfProcesses; i++) {
             String processName;
             int processArrivalTime;
             int processBurstTime;
@@ -154,14 +148,14 @@ public class Main {
             System.out.println("Please enter process number " + (i + 1) + " burst time: ");
             processBurstTime = scanner.nextInt();
 
-            if(schedulerType == Schedulers.PRIORITY){
+            if (schedulerType == Schedulers.PRIORITY) {
 
                 System.out.println("Please enter process number " + (i + 1) + " priority: ");
                 int processPriority = scanner.nextInt();
 
                 ProcessControlBlock process = new ProcessControlBlock(processName, processArrivalTime, processBurstTime, processPriority);
                 processes.add(process);
-            }else{
+            } else {
                 ProcessControlBlock process = new ProcessControlBlock(processName, processArrivalTime, processBurstTime);
                 processes.add(process);
             }
