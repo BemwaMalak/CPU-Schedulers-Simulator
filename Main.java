@@ -43,14 +43,14 @@ public class Main {
         }
 
 
-        Schedulers scheduler = getSchedulerFromChoice(choice);
+        Schedulers scheduler = getSchedulerTypeFromChoice(choice);
 
         startScheduler(scheduler);
 
 
 
     }
-    private static Schedulers getSchedulerFromChoice(int choice){
+    private static Schedulers getSchedulerTypeFromChoice(int choice){
         switch (choice){
             case 1:
                 return Schedulers.SHORTEST_JOB_FIRST;
@@ -61,93 +61,34 @@ public class Main {
         }
         return null;
     }
-    private static void startScheduler(Schedulers scheduler) throws IOException, InterruptedException {
-        switch (scheduler){
-            case SHORTEST_JOB_FIRST:
-                startShortestJobFirstScheduler();
-                break;
-            case ROUND_ROBIN:
-                startRoundRobinScheduler();
-                break;
-            case PRIORITY:
-                startPriorityScheduler();
-                break;
+    private static void startScheduler(Schedulers schedulerType) throws IOException, InterruptedException {
+        SimulatorSetup simulatorSetup = getSimulatorSetupFromUser(schedulerType);
+        Vector<ProcessControlBlock> processes = getProcessesFromUser(simulatorSetup, schedulerType);
+
+        ProcessQueue readyQueue = new ProcessQueue();
+        ProcessQueue jobQueue = new ProcessQueue();
+
+        jobQueue.addAll(processes);
+        Scheduler scheduler;
+        if(schedulerType == Schedulers.ROUND_ROBIN){
+            scheduler = SchedulerFactory.getScheduler(schedulerType, readyQueue, simulatorSetup.getTimeManager(), simulatorSetup.getLogger(), simulatorSetup.getContextSwitchingCost(), simulatorSetup.getQuantumTime());
+        }else{
+            scheduler = SchedulerFactory.getScheduler(schedulerType, readyQueue, simulatorSetup.getTimeManager(), simulatorSetup.getLogger(), simulatorSetup.getContextSwitchingCost());
         }
-    }
-    private static void startShortestJobFirstScheduler() throws IOException, InterruptedException {
-        SimulatorSetup simulatorSetup = getSimulatorSetupFromUser(Schedulers.SHORTEST_JOB_FIRST);
-        Vector<ProcessControlBlock> processes = getProcessesFromUser(simulatorSetup, Schedulers.SHORTEST_JOB_FIRST);
 
-
-
-
-        ProcessQueue readyQueue = new ProcessQueue();
-        ProcessQueue jobQueue = new ProcessQueue();
-
-        jobQueue.addAll(processes);
-
-        ShortestJobFirstScheduler shortestJobFirstScheduler = new ShortestJobFirstScheduler(readyQueue, simulatorSetup.getTimeManager(), simulatorSetup.getLogger(), simulatorSetup.getContextSwitchingCost());
         LongTermScheduler longTermScheduler = new LongTermScheduler(jobQueue, readyQueue, simulatorSetup.getTimeManager(), simulatorSetup.getLogger());
 
-        shortestJobFirstScheduler.start();
+        scheduler.start();
         longTermScheduler.start();
 
         longTermScheduler.join();
-        shortestJobFirstScheduler.join();
+        scheduler.join();
 
         simulatorSetup.getLogger().finishLogging();
+
     }
 
-    private static void startRoundRobinScheduler() throws InterruptedException, IOException {
-
-        SimulatorSetup simulatorSetup = getSimulatorSetupFromUser(Schedulers.ROUND_ROBIN);
-        Vector<ProcessControlBlock> processes = getProcessesFromUser(simulatorSetup, Schedulers.ROUND_ROBIN);
-
-
-
-
-        ProcessQueue readyQueue = new ProcessQueue();
-        ProcessQueue jobQueue = new ProcessQueue();
-
-        jobQueue.addAll(processes);
-
-        RoundRobinScheduler roundRobinScheduler = new RoundRobinScheduler(readyQueue, simulatorSetup.getTimeManager(), simulatorSetup.getLogger(), simulatorSetup.getQuantumTime(), simulatorSetup.getContextSwitchingCost());
-        LongTermScheduler longTermScheduler = new LongTermScheduler(jobQueue, readyQueue, simulatorSetup.getTimeManager(), simulatorSetup.getLogger());
-
-        roundRobinScheduler.start();
-        longTermScheduler.start();
-
-        longTermScheduler.join();
-        roundRobinScheduler.join();
-
-        simulatorSetup.getLogger().finishLogging();
-    }
-
-    private static void startPriorityScheduler() throws InterruptedException, IOException {
-        SimulatorSetup simulatorSetup = getSimulatorSetupFromUser(Schedulers.PRIORITY);
-        Vector<ProcessControlBlock> processes = getProcessesFromUser(simulatorSetup, Schedulers.PRIORITY);
-
-
-
-
-        ProcessQueue readyQueue = new ProcessQueue();
-        ProcessQueue jobQueue = new ProcessQueue();
-
-        jobQueue.addAll(processes);
-
-        PriorityScheduler priorityScheduler = new PriorityScheduler(readyQueue, simulatorSetup.getTimeManager(), simulatorSetup.getLogger(), simulatorSetup.getContextSwitchingCost());
-        LongTermScheduler longTermScheduler = new LongTermScheduler(jobQueue, readyQueue, simulatorSetup.getTimeManager(), simulatorSetup.getLogger());
-
-        priorityScheduler.start();
-        longTermScheduler.start();
-
-        longTermScheduler.join();
-        priorityScheduler.join();
-
-        simulatorSetup.getLogger().finishLogging();
-    }
-
-    private static SimulatorSetup getSimulatorSetupFromUser(Schedulers scheduler) throws IOException {
+    private static SimulatorSetup getSimulatorSetupFromUser(Schedulers schedulerType) throws IOException {
         Scanner scanner = new Scanner(System.in);
 
         TimeManager timeManager = new TimeManager();
@@ -155,7 +96,7 @@ public class Main {
 
         String logFilePath = "logs\\" + dateFormatter.format(timestamp) + " ";
 
-        switch (scheduler){
+        switch (schedulerType){
             case SHORTEST_JOB_FIRST -> logFilePath += "ShortestJobFirst.txt";
             case PRIORITY -> logFilePath += "Priority.txt";
             case ROUND_ROBIN -> logFilePath += "RoundRobin.txt";
@@ -174,7 +115,7 @@ public class Main {
         System.out.println("Please enter the context switching cost: ");
         contextSwitchingCost = scanner.nextInt();
 
-        if(scheduler == Schedulers.ROUND_ROBIN){
+        if(schedulerType == Schedulers.ROUND_ROBIN){
 
             System.out.println("Please enter the quantum time: ");
             int quantumTime = scanner.nextInt();
@@ -193,7 +134,7 @@ public class Main {
 
     }
 
-    private static Vector<ProcessControlBlock> getProcessesFromUser(SimulatorSetup simulatorSetup, Schedulers scheduler){
+    private static Vector<ProcessControlBlock> getProcessesFromUser(SimulatorSetup simulatorSetup, Schedulers schedulerType){
         Scanner scanner = new Scanner(System.in);
 
         int totalNumberOfProcesses = simulatorSetup.getTotalNumberOfProcesses();
@@ -213,7 +154,7 @@ public class Main {
             System.out.println("Please enter process number " + (i + 1) + " burst time: ");
             processBurstTime = scanner.nextInt();
 
-            if(scheduler == Schedulers.PRIORITY){
+            if(schedulerType == Schedulers.PRIORITY){
 
                 System.out.println("Please enter process number " + (i + 1) + " priority: ");
                 int processPriority = scanner.nextInt();
