@@ -4,6 +4,29 @@ public abstract class CPUScheduler extends Scheduler {
 
     protected ProcessQueue readyQueue;
 
+
+    public void run() {
+        while (!readyQueue.isEmpty() || !LongTermScheduler.isFinished()) {
+            if (!LongTermScheduler.isFinished()) {
+
+                timeManager.waitForCPUScheduler();
+
+                execute();
+
+                timeManager.signalForLongTermScheduler();
+                timeManager.tick();
+            } else {
+                execute();
+
+                // Ticks for LongTermScheduler and Ticks for itself
+                timeManager.tick();
+                timeManager.tick();
+            }
+        }
+
+        logSchedulerFinished();
+    }
+
     protected abstract void execute();
 
 
